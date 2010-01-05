@@ -18,27 +18,28 @@ function content_moderation_schema() {
       'nid'          => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
     ),
     'primary key' => array('vid'),
-    'unique keys' => array('nid' => array('nid'))    
+    'unique keys' => array('nid' => array('nid'))
   );
-  
+
   $schema['content_moderation_revision_state'] = array(
     'description' => t('Saves the current live vid of a node'),
     'fields' => array(
       'vid'          => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
       'nid'          => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-      'state'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE)),
+      'state'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
     ),
     'primary key' => array('vid'),
   );
-  
+
   $schema['content_moderation_states'] = array(
     'description' => t('Saves the current live vid of a node'),
     'fields' => array(
       'sid'          => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-      'name'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE)),
+      'name'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
     ),
-    'unique keys' => array('name' => array('name'))    
-  ); 
+    'unique keys' => array('name' => array('name'))
+  );
+
   $schema['content_moderation_node_history'] = array(
     'fields' => array(
       'hid'     => array('type' => 'serial', 'not null' => TRUE),
@@ -54,7 +55,6 @@ function content_moderation_schema() {
       'nid' => array('vid', 'sid')),
   );
 
-   
   return $schema;
 }
 

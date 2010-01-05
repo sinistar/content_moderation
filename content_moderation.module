@@ -1,13 +1,30 @@
-<? 
-
+<?
+/*
+ * Implementation of hook_menu().
+ */
+ function content_moderation_menu() {
+  $states = _content_moderation_states();
+  foreach($states as $state) {
+    $items["node/%/moderate/%/$state->name}"] = array(
+    'title callback' => '_content_moderation_sc_title',
+    'title arguments' => array(4),
+    'type' => LOCAL_TASK,
+    'access callback' => '_content_moderation_statechange_allowed',
+    'access arguments' => array(4,1,3),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_moderation_change_state_form', 1,3,4),
+    'file' => 'content_moderation_workflow.inc'
+    );
+  }
+}
 
 /**
  * Implementation of hook_help().
  */
-function modr8_help($path, $arg) {
+function content_moderation_help($path, $arg) {
   switch ($path) {
     case 'admin/help#content_moderation':
-      return '<p>'. t("Enables you to moderate the creation of nodes and there further editing. You can have 'Live version' for all visitors and pending revisions which need to be apoved and become the 'Live Version' then") .'</p>';    
+      return '<p>'. t("Enables you to moderate the creation of nodes and there further editing. You can have 'Live version' for all visitors and pending revisions which need to be apoved and become the 'Live Version' then") .'</p>';
   }
 }
 
@@ -46,7 +63,7 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
       // TODO: We could also use $node->old_vid to restore the live version instead
       // using the relation table.
       $live_vid = _content_moderation_get_node_var('vid', $node->nid, 0);
-      
+
       // If live_nid is 0, the system wants us the create a new live revision by defintion of
       // our content_moderation API ( see content_moderation_reset_live_status($nid) ).
       if ($live_vid > 0) {
@@ -97,7 +114,7 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
             $links[] = l(t('Publish revision'), "node/$node->nid/revisions/$node->vid/publish");
           }
         }
-        
+
         if ($delete && $moderate) {
           $links[] = l(t('(Delete revision)'), "node/$node->nid/revisions/$node->vid/delete");
         }
@@ -128,7 +145,7 @@ function content_moderation_reset_live_status($nid = NULL) {
   if ($nid == NULL || !is_numeric($nid)) {
     return;
   }
-  
+
   db_query('DELETE from {content_moderation} WHERE nid = %d', $nid);
 }
 
@@ -162,7 +179,7 @@ function _content_moderation_new_node(&$node) {
   _content_moderation_set_node_var(array(
     'nid'=>$node->nid,'vid'=>$node->vid
   ));
-  
+
   // We saved a "pending" version of the node first, lets restore the real content
   // and the real log message.
   $node->body = $node->body_orig;
