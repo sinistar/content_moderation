@@ -5,6 +5,7 @@
 function content_moderation_install() {
   // Create tables.
   drupal_install_schema('content_moderation');
+  _content_moderation_insert_values();
 }
 
 /**
@@ -32,9 +33,8 @@ function content_moderation_schema() {
   );
 
   $schema['content_moderation_states'] = array(
-    'description' => t('Saves the current live vid of a node'),
+    'description' => t('Defines all possible states'),
     'fields' => array(
-      'sid'          => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
       'name'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
     ),
     'unique keys' => array('name' => array('name'))
@@ -45,19 +45,53 @@ function content_moderation_schema() {
       'hid'     => array('type' => 'serial', 'not null' => TRUE),
       'vid'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
       'nid'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
-      'old_sid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
-      'sid'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+      'old_state_name' => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
+      'state_name'     => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
       'uid'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
       'stamp'   => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
       'comment' => array('type' => 'text', 'size' => 'big', 'not null' => FALSE)),
     'primary key' => array('hid'),
-    'indexes' => array(
-      'nid' => array('vid', 'sid')),
+  );
+
+  $schema['content_moderation_transition'] = array(
+    'description' => t('Defines the valid transitions for states'),
+    'fields' => array(
+      'from_name'          => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
+      'to_name'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
+      'ntype'      => array('type' => 'varchar', 'length' => '40', 'not null' => FALSE),
+    ),
   );
 
   return $schema;
 }
 
+function _content_moderation_insert_values() {
+  $states = array(
+    array(
+      'name' => 'none',
+    ),
+    array(
+      'name' => 'review',
+    ),
+    array(
+      'name' => 'approve',
+    ),
+    array(
+      'name' => 'live',
+    ),
+  );
+  foreach($states as $state) {
+      db_query('insert into {content_moderation_states} (`name`) VALUES("%s")',$state);
+  }
+
+  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("none","review","all")');
+  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("review","approve","all")');
+  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("approve","live","all")');
+}
+
+function content_moderation_update_6001(){
+  db_query("UPDATE {system} SET weight = 15 WHERE name = 'content_moderation'");
+}
 /**
  * Implementation of hook_uninstall().
  */
