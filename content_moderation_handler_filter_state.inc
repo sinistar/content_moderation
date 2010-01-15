@@ -8,13 +8,11 @@
 class content_moderation_handler_filter_state extends views_handler_filter {
   function option_definition() {
     $options = parent::option_definition();
-
     $options['value'] = array('default' => NULL);
-
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  function value_form(&$form, &$form_state) {
     $result = db_query("select name FROM {content_moderation_states}");
     while ($item = db_fetch_array($result)) {
       $options[$item['name']] = $item['name'];
@@ -24,7 +22,7 @@ class content_moderation_handler_filter_state extends views_handler_filter {
       '#options' => $options,
       '#default_value' => $this->options['state'],
       '#title' => t('State'),
-      '#description' => t('Select a workflow state'),
+      '#description' => t('Select a workflow state (content moderation)'),
     );
   }
 

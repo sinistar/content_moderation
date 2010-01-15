@@ -108,15 +108,13 @@ function content_moderation_change_state_form_submit($form, &$form_state) {
  */
 function _content_moderation_update_revision_state($vid,$nid,$state) {
   $revison_state = array(
-    'nid' => $vid,
-    'vid' => $nid,
+    'nid' => $nid,
+    'vid' => $vid,
     'state' => $state,
   );
   $keys = array();
   // Check if we have an entry allready. Update if needed.
-  $result = db_fetch_object(
-              db_query("select vid from {content_moderation_revision_state} where vid=%d", $vid)
-            );
+  $result = db_fetch_object( db_query("select vid from {content_moderation_revision_state} where vid=%d", $vid) );
   if(is_object($result)) {
     $keys = array('vid');
   }
@@ -128,10 +126,13 @@ function _content_moderation_update_revision_state($vid,$nid,$state) {
  * Make the given vid the new live version.
  */
 function _content_moderation_set_live($vid,$nid) {
-   // Set the internal pointer of the live vid.
-  _content_moderation_set_node_var(array('vid' => $vid,'nid' => $nid), array(array('name' => 'vid','value' =>$vid)));
   // Save the vid in the node table.
   db_query('UPDATE {node} SET vid = %d WHERE nid = %d', $vid, $nid);
+  // Reset all current states of revisisions of this node, which are live
+  // as we can have more then one live revision.
+  // We are not resetting the history though, because it should be visible
+  // which node has been live, approved by who and so forth.
+  db_query('UPDATE {content_moderation_revision_state} SET state = "none" WHERE nid = %d AND state="live"', $nid);
 }
 
 /*
@@ -155,7 +156,7 @@ function _content_moderation_save_history($node,$curstate,$nextstate,$uid,$comme
  * Gets the history of a node or a revision, depending on the key.
  */
 function _content_moderation_get_history($key) {
-  $result = db_query('select * from content_moderation_node_history where '.$key['name'].'=%d order by stamp DESC' ,$key['value']);
+  $result = db_query('select * from {content_moderation_node_history} where '.$key['name'].'=%d order by stamp DESC' ,$key['value']);
   $history = array();
 
   while ($entry = db_fetch_object($result)) {
@@ -217,7 +218,7 @@ function _content_moderation_statechange_allowed($vid,$state = NULL) {
 
   // Is this content even in moderatation?
   if(!_content_moderation_moderate_node_type($node->type)) {
-    drupal_set_message(t('this content type is not under moderation'),'error');
+    drupal_set_message(t('this content type ('.$node->type.') is not under moderation'),'error');
     return false;
   }
 
@@ -251,6 +252,7 @@ function _content_moderation_statechange_allowed($vid,$state = NULL) {
 function _content_moderation_current_state($vid) {
   $result = db_query('select state from {content_moderation_revision_state} where vid=%d',$vid);
   $row = db_fetch_object($result);
+
   if(is_object($row)) {
     return $row->state;
   }
