@@ -1,6 +1,10 @@
 <?php
 // $Id$
 
+# Copyright (c) 2010 Impressive.media
+# Author: Eugen Mayer
+// $Id$
+
 /**
  * @file
  *   Filter state handlers.
@@ -22,7 +26,7 @@ class content_moderation_handler_filter_state extends views_handler_filter {
       '#options' => $options,
       '#default_value' => $this->options['state'],
       '#title' => t('State'),
-      '#description' => t('Select a workflow state (content moderation)'),
+      '#description' => t('Select a workflow state (content moderation).'),
     );
   }
 
