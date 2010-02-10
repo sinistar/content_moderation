@@ -46,7 +46,7 @@ if(module_exists('diff')){
   <h4><?=t('Viewing')?></h4>
   <div class="info"><label><?=$node->vid?>:</label> (<?=$state?>) <?=$view_current_link.$edit_state.$compare_live.$delete_current?><br/>
     <span class="details">&raquo; <?=date('d.m.y',$live->revision_timestamp)?> (<?=$user->name?>)</span>
-    <span class="details state">&raquo; Status: <?=$state?></span>
+    <span class="details state">&raquo; Status: <?=t($state)?></span>
   </div>
   <?php }?>
 
