@@ -211,11 +211,13 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
       }
       else {
         $count = db_result(db_query('select count(vid) from {node_revisions} where vid>%d and nid=%d',$node->vid,$node->nid));
-        if($count == 1)
-          drupal_set_message(t('This document has 1 pending revision',array('@count' => $count)));
-        else if($count > 1) {
-          drupal_set_message(t('This document has @count pending revisions',array('@count' => $count)));
-        }
+	if(arg(0) == 'node' && is_numeric(arg(1))) {
+	        if($count == 1)
+        	  drupal_set_message(t('This document has 1 pending revision',array('@count' => $count)));
+	        else if($count > 1) {
+        	  drupal_set_message(t('This document has @count pending revisions',array('@count' => $count)));
+	        }	
+	}
       }
       break;
   }
