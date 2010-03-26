@@ -64,7 +64,7 @@ function content_moderation_block($op = "list", $delta = 0, $edit = array()){
           $live = _content_moderation_live_revision($node->nid);
 
           $m = drupal_get_path('module', 'content_moderation');
-          drupal_add_css("$m/css/block.css");
+          drupal_add_css("$m/css/content_moderation_block.css");
 
           $latest = _content_moderation_get_latest_revisions($node->nid,5,NULL,array($node->vid));
           $revisions_list = theme('content_moderation_revisions_list',$latest);
@@ -381,7 +381,7 @@ function _content_moderation_latest_revision($nid) {
  */
 function _content_moderation_history($node) {
   $m = drupal_get_path('module', 'content_moderation');
-  drupal_add_css("$m/css/history.css");
+  drupal_add_css("$m/css/content_moderation_history.css");
   $history = _content_moderation_get_history(array('name' => 'nid', 'value' => $node->nid));
   drupal_set_title(t('History'));
   return theme('content_moderation_node_history',$history);
