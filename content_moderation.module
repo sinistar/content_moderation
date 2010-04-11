@@ -23,7 +23,7 @@ function content_moderation_menu() {
   );
   $items["node/%node/moderation_history"] = array(
       'title' => 'Moderation history',
-      'description' => t('Show the content moderation history.'),
+      'description' => 'Show the content moderation history.',
       'type' => MENU_LOCAL_TASK,
       'page callback' => '_content_moderation_history',
       'page arguments' => array(1),
@@ -217,7 +217,7 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
         	  drupal_set_message(t('This document has 1 pending revision',array('@count' => $count)));
 	        else if($count > 1) {
         	  drupal_set_message(t('This document has @count pending revisions',array('@count' => $count)));
-	        }	
+	        }
 	}
       }
       break;
@@ -234,20 +234,20 @@ function content_moderation_perm() {
   $states = _content_moderation_states();
   $types = _content_moderation_moderate_node_types();
 
-  $rigths = array();
+  $rights = array();
   foreach($types as $type) {
     foreach($states as $from_state) {
         $to_states = _content_moderation_next_states($from_state,$type);
         // values are translated
         $to_states = array_keys($to_states);
         foreach($to_states as $to_state) {
-          $rigths[] = "content moderation $type state $from_state to $to_state";
+          $rights[] = "content moderation $type state $from_state to $to_state";
         }
     }
-    $rigths[] = "content moderation view $type moderation history";
+    $rights[] = "content moderation view $type moderation history";
   }
 
-  return $rigths;
+  return $rights;
 }
 
 /*
@@ -322,7 +322,7 @@ function theme_content_moderation_node_history($history) {
     $data[] = array (
       date('d.m.y - h:i', $e->stamp),                         // date
       l($user->name,"user/{$user->uid}"),                     // Who changed that state?
-      "<span class='$state_class'>".ucfirst(t($e->old_state_name)).' -> '.ucfirst(t($e->state_name)).'</span>',             // Transition
+      "<span class='$state_class'>".ucfirst(t('!old',array('!old' => $e->old_state_name))).' -> '.ucfirst(t($e->state_name)).'</span>',             // Transition
       l($e->vid,"node/{$e->nid}/revisions/{$e->vid}/view")   // revision
     );
   }
