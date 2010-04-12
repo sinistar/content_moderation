@@ -136,7 +136,7 @@ function _content_moderation_set_live($vid,$nid) {
   // as we can have more then one live revision.
   // We are not resetting the history though, because it should be visible
   // which node has been live, approved by who and so forth.
-  db_query('UPDATE {content_moderation_revision_state} SET state = "none" WHERE nid = %d AND state="live"', $nid);
+  db_query('UPDATE {content_moderation_revision_state} SET state = "none" WHERE nid = %d AND vid<>%d AND state="live"', $nid,$vid);
 }
 
 /*
