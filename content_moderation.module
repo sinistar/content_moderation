@@ -381,8 +381,9 @@ function theme_content_moderation_node_history($history) {
       l($e->vid,"node/{$e->nid}/revisions/{$e->vid}/view")   // revision
     );
   }
-
-  return theme('table',
+  $title = t('Moderation history');
+  $title = "<h2>$title</h2>";
+  return $title.theme('table',
                 array(
                       t('Date'),
                       t('Author'),
