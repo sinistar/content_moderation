@@ -672,3 +672,23 @@ function _content_moderation_show_latest_revision($node) {
   menu_set_active_item("node/{$node->nid}/revisions/{$node->vid}/view");
   return node_page_view($node);
 }
+/*
+function content_moderation_date_formats() {
+  $formats[] = array(
+    'type' => 'contente_moderation_history',
+    'format' => 'd.m.y h:i',
+    'locales' => array('en'),
+  );
+   $formats[] = array(
+    'type' => 'contente_moderation_history',
+    'format' => 'd.m.y h:i',
+    'locales' => array('de'),
+  );
+}
+
+function content_moderation_date_format_types() {
+  return array(
+    'contente_moderation_history' => t('Content moderation history'),
+    'contente_moderation_small' => t('Content moderation small'),
+  );
+}*/

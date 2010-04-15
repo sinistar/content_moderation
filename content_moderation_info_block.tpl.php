@@ -50,7 +50,7 @@ if(module_exists('diff')){
     $live_user = user_load($live->revision_uid);
     ?>
     <div class="info live_info"><?php print $live->vid?>: <?=$live_link.$view_live_link.$compare?><br/>
-    <span class="details">&raquo; <?php print date('d.m.y',$live->changed)?> (<?php print $live_user->name?>)</span>
+    <span class="details">&raquo; <?php print format_date($live->revision_timestamp, 'small')?> (<?php print $live_user->name?>)</span>
     </div>
   <?php }  else { ?>
     <div class="info live_info"><?php print t('nothing approved yet');?></div>
@@ -60,7 +60,7 @@ if(module_exists('diff')){
   <?php if($live == NULL || $node->vid != $live->vid) {?>
   <h4><?php print t('Viewing')?></h4>
   <div class="info"><label><?php print $current_rev_link?>:</label> (<?php print $state?>) <?php print $view_current_link.$edit_state.$compare_live.$delete_current?><br/>
-    <span class="details">&raquo; <?php print date('d.m.y',$node->changed)?> (<?php print $current_user->name?>)</span>
+    <span class="details">&raquo; <?php print format_date($node->revision_timestamp, 'small')?> (<?php print $current_user->name?>)</span>
     <span class="details state">&raquo; Status: <?php print t($state)?></span>
   </div>
   <?php }?>
