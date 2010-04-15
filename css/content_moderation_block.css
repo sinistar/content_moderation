@@ -25,6 +25,17 @@
   font-size:.8em;
 }
 
+#content_moderation .info {
+  -moz-background-clip:border;
+  -moz-background-inline-policy:continuous;
+  -moz-background-origin:padding;
+  background:#F8F8F8 none repeat scroll 0 0;
+  color:#666666;
+  font-size:91.7%;
+  margin-bottom:0.5em;
+  padding:0px 10px 10px 10px;
+}
+
 #content_moderation .live_info a
 {
   font-weight:400;
