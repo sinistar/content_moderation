@@ -102,7 +102,7 @@ function content_moderation_block($op = "list", $delta = 0, $edit = array()){
           $m = drupal_get_path('module', 'content_moderation');
           drupal_add_css("$m/css/content_moderation_block.css");
 
-          $pending_revisions = _content_moderation_get_latest_revisions($node->nid,5,NULL);
+          $pending_revisions = _content_moderation_get_latest_revisions($node->nid,variable_get('content_moderation_pending_count', 5),NULL);
           $revisions_list = theme('content_moderation_revisions_list',$pending_revisions);
 
           // All kinds of actions we can do.
