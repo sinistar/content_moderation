@@ -132,7 +132,7 @@ function _content_moderation_update_revision_state($vid,$nid,$state) {
 function _content_moderation_set_live($vid,$nid) {
   $revision = _content_moderation_revision_infos($vid);
   // Save the vid in the node table.
-  db_query('UPDATE {node} SET vid = %d, changed="%s" WHERE nid = %d', $vid, $revision->timestamp, $nid);
+  db_query('UPDATE {node} SET vid = %d, status = 1, changed="%s" WHERE nid = %d', $vid, $revision->timestamp, $nid);
 
   // Reset all current states of revisisions of this node, which are live
   // as we can have more then one live revision.
