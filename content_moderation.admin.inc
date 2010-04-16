@@ -67,7 +67,7 @@ function content_moderation_admin_settings_states() {
 
   $form['content_moderation_states']['submit_states'] = array(
     '#type' => 'submit',
-    '#value' => t('Save States')
+    '#value' => t('Save')
   );
 
 	return $form;
@@ -109,7 +109,7 @@ function content_moderation_admin_settings_transitions() {
 
   $form['content_moderation_transitions']['submit_transitions'] = array(
     '#type' => 'submit',
-    '#value' => t('Save Transitions')
+    '#value' => t('Save')
   );
 
   return $form;
@@ -154,14 +154,12 @@ function content_moderation_admin_settings_states_submit($form, &$form_state)
 		}
 	}
 	if ( isset($form_values['new_state_name']) && strlen($form_values['new_state_name']) > 0 ) {
+    $new_state = (object) null;
+    $new_state->name = $form_values['new_state_name'];
 		if ( isset($form_values['new_state_desc']) && strlen($form_values['new_state_desc']) > 0 ) {
-			$q = ' INSERT INTO {content_moderation_states} VALUES ( "%s", "%s" ) ';
-			$r = db_query($q, array($form_values['new_state_name'],$form_values['new_state_desc']));
+      $new_state->desc = $form_values['new_state_desc'];
 		}
-		else {
-			$q = ' INSERT INTO {content_moderation_states} VALUES ( "%s", NULL ) ';
-			$r = db_query($q, array($form_values['new_state_name']));
-		}
+    drupal_write_record('content_moderation_states', $new_state);
 	}
 	drupal_set_message(t('Your settings have been saved.'));
 }
@@ -176,9 +174,12 @@ function content_moderation_admin_settings_transitions_submit($form, &$form_stat
 			$r = db_query($q, array($transinfo[0], $transinfo[1]));
 		}
 	}
-	if ( is_string($form_values['new_transition_from']) && is_string($form_values['new_transition_to']) ) {
-		$q = ' INSERT INTO {content_moderation_transition} VALUES ( "%s", "%s", "%s" ) ';
-		$r = db_query($q, array($form_values['new_transition_from'],$form_values['new_transition_to'], 'all'));
+	if ( $form_values['new_transition_from'] != '0' && $form_values['new_transition_to'] != '0' ) {
+    $new_transition = (object) null;
+    $new_transition->from_name = $form_values['new_transition_from'];
+    $new_transition->to_name = $form_values['new_transition_to'];
+    $new_transition->ntype = 'all';
+		drupal_write_record('content_moderation_transition', $new_transition);
 	}
   drupal_set_message(t('Your settings have been saved.'));
 }
