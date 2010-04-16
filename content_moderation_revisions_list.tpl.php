@@ -18,16 +18,21 @@ if(!is_array($revisions) || count($revisions) == 0) {
 ?>
 <div class='revision_list'>
 <?php
+$edit_icon = '<span class="tinyicon t_editicon"></span>';
+$rev_icon = '<span class="tinyicon t_revisionicon"></span>';
+$view_icon = '<span class="tinyicon t_viewicon"></span>';
+$edit_state_icon = '<span class="tinyicon t_changestateicon"></span>';
+
 foreach($revisions as $rev) {
-  $edit_icon = '<span class="tinyicon t_editicon"></span>';
-  $rev_icon = '<span class="tinyicon t_revisionicon"></span>';
-  $view_icon = '<span class="tinyicon t_viewicon"></span>';
-  $edit_state_icon = '<span class="tinyicon t_changestateicon"></span>';
+  $edit_state_link = '';
+  $compare_live = '';
+  $compare = '';
 
   $view_link = l($view_icon,"node/{$rev->nid}/revisions/{$rev->vid}/view",array('html' => true, 'attributes' => array( 'title' => t('View revision @rev.',array('@rev' => $rev->vid) ))));
   $revision_link = l($rev->vid,"node/{$rev->nid}/revisions/{$rev->vid}/view",array('html' => true, 'attributes' => array( 'title' => t('View revision @rev.',array('@rev' => $rev->vid) ))));
 
-  if(_content_moderation_statechange_allowed($rev->vid)) {
+  if(_content_moderation_statechange_allowed($rev->vid) !== false) {
+    dsm("allowed $rev->vid");
     $edit_state_link = l($edit_state_icon,_content_moderation_change_state_link($rev->vid,$rev->nid),array('html' => true, 'attributes' => array( 'title' => t('Change state of revision @rev.',array('@rev' => $rev->vid) ))));
   }
   if(module_exists('diff')){

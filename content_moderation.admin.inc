@@ -13,14 +13,22 @@ function content_moderation_admin_settings() {
     '#description' => t('Define how many pending revisions shall be visible in content_moderation block. This number will restrict the shown revisions cutting out oldest ones first. By setting this to 1 you\'ll only ever see the newest pending revision.'),
 		'#default_value' => variable_get('content_moderation_pending_count', 5),
   );
+  $form['content_moderation_moderate_latest_only'] = array(
+    '#title' => t('Edit stop on revision-moderation'),
+    '#type' => 'checkbox',
+    '#description' => t('When you enable this, you will only be able to<br> - Change the state of the latest revision of the dokument<br> - Edit the dokument only if the latest state has the status none<br>Please refer to the documentation for further details<br><strong>Be aware enabling this feature if you have already moderated revisions which are not the latest!</strong><br> <strong>Only disable this feature if you exactly know what you are going to expect!</strong>'),
+    '#default_value' => variable_get('content_moderation_moderate_latest_only', 1),
+  );
   $form['content_moderation_force_publish'] = array(
     '#title' => t('Force publishing on new nodes'),
     '#type' => 'checkbox',
-		'#description' => t('The intended default value is checked (feature by design).<br/>However, it is then impossible to first create a(n unpublished) draft. By unchecking this feature content types\' publishing options may be set to "unpublished". When a draft goes "live" (transition into moderation state "live") for the first time the node will be published automatically. After that only users with the right "administer nodes" are able to unpublish it again (making it a draft).<br/><strong>This feature is not yet intended (as of version 6.x-1.2) and therefore marked EXPERIMENTAL.</strong>'),
+		'#description' => t('The intended default value is checked (feature by design).<br/>However, it is then impossible to first create a(n unpublished) draft. By unchecking this feature content types\' publishing options may be set to "unpublished". When a draft goes "live" (transition into moderation state "live") for the first time the node will be published automatically. After that only users with the right "administer nodes" are able to unpublish it again (making it a draft).<br/>'),
 		'#default_value' => variable_get('content_moderation_force_publish', 1),
   );
-	
-	return system_settings_form($form); 
+
+
+
+	return system_settings_form($form);
 }
 
 
@@ -35,7 +43,7 @@ function content_moderation_admin_settings_states() {
     '#title' => t('Content moderation states'),
     '#description' => t('Use to define new states or to delete existing ones. States have to be defined before corresponding transitions can be set up.')
   );
-  
+
   $form['content_moderation_states']['delete_states'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Delete existing states'),
@@ -43,7 +51,7 @@ function content_moderation_admin_settings_states() {
     '#options' => _content_moderation_admin_states(),
     '#description' => t('Please note: when deleting an existing state all transitions involving this state will also be deleted.')
   );
-  
+
   $form['content_moderation_states']['new_state_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Create new state'),
@@ -51,17 +59,17 @@ function content_moderation_admin_settings_states() {
     '#maxlength' => 255,
     '#description' => t('Enter name of new state.')
   );
-  
+
   $form['content_moderation_states']['new_state_desc'] = array(
     '#type' => 'textarea',
     '#description' => t('Enter an optional description of new state.')
   );
-  
+
   $form['content_moderation_states']['submit_states'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Save States')
   );
-	
+
 	return $form;
 }
 
@@ -76,7 +84,7 @@ function content_moderation_admin_settings_transitions() {
     '#title' => t('Content moderation transitions'),
     '#description' => t('Use to define new transitions or to delete existing ones. Transitions may be set up with existing states only.')
   );
-  
+
   $form['content_moderation_transitions']['delete_transitions'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Delete existing transitions'),
@@ -84,23 +92,23 @@ function content_moderation_admin_settings_transitions() {
     '#options' => _content_moderation_admin_transitions(),
     '#description' => t('Please note: deleting an existing transition will not have any impact on states involved.')
   );
-  
+
   $form['content_moderation_transitions']['new_transition_from'] = array(
     '#type' => 'select',
     '#title' => t('New transition from'),
     '#default_value' => array(),
     '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states()),
   );
-  
+
   $form['content_moderation_transitions']['new_transition_to'] = array(
     '#type' => 'select',
     '#title' => t('to'),
     '#default_value' => array(),
     '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states()),
   );
-  
+
   $form['content_moderation_transitions']['submit_transitions'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Save Transitions')
   );
 

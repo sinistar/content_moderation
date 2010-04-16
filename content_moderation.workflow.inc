@@ -235,6 +235,15 @@ function _content_moderation_statechange_allowed($vid,$state = NULL) {
     return false;
   }
 
+  if(variable_get('content_moderation_moderate_latest_only', 1) === 1) {
+    $revisions = _content_moderation_get_latest_revisions($nid,1);
+    // Do not allow state changing of revisions, which are not the latest
+
+    if(!is_array($revisions) || $revisions[0]->vid != $vid) {
+      return false;
+    }
+  }
+
   // User must have write access to do anything state related
   if(module_exists('impressive_media_icombinded_access')) {
     if(impressive_media_icombined_access_accesscheck('update', $node) === false) {
