@@ -370,7 +370,7 @@ function content_moderation_form_alter(&$form, $form_state, $form_id)  {
     $form['revision_information']['revision']['#disabled'] = true;
     $form['revision_information']['revision']['#default_value'] = true;
     $descr = t('You cant choose here, as this content is under moderation. Publishing is forced.');
-    if(is_array($form['options']['status'])) {
+    if(is_array($form['options']['status']) && variable_get('content_moderation_force_publish', 1)) {
       $form['options']['status']['#disabled'] = true;
       $form['options']['status']['#default_value'] = true;
       $form['options']['status']['#prefix'] = $descr;
