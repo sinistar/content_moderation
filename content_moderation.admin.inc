@@ -115,20 +115,12 @@ function content_moderation_admin_settings_transitions() {
   return $form;
 }
 
-/*
- * Get all states possible
- */
-function _content_moderation_admin_states() {
-  ctools_include('export');
-  return ctools_export_load_object('content_moderation_states', 'all');
-}
-
 /**
  * Get all states possible, but only name and description.
  */
 function _content_moderation_admin_states_names() {
   $states = array();
-  foreach (_content_moderation_admin_states() as $name => $state) {
+  foreach (content_moderation_states() as $name => $state) {
     $states[$name] = $state->descr ? $state->descr : $state->name;
   }
   return $states;

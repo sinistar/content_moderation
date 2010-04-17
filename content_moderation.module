@@ -300,6 +300,15 @@ function content_moderation_drupalwiki_menu_alter($tree) {
 
   return $tree;
 }
+
+/*
+ * Get all states possible
+ */
+function content_moderation_states() {
+  ctools_include('export');
+  return ctools_export_load_object('content_moderation_states', 'all');
+}
+
 /*
  * Implementation of hook_perm.
  */
@@ -307,7 +316,8 @@ function content_moderation_perm() {
   // TODO: cache this
   // This user right is later used for granting the user the approval of pending version
   // making those version "live".
-  $states = _content_moderation_states();
+
+  $states = _content_moderation_states_names();
   $types = _content_moderation_moderate_node_types();
 
   $rights = array();
@@ -671,7 +681,7 @@ function _content_moderation_node_transition_matrix() {
   if(count($node_state_matrix) > 0) {
     return $node_state_matrix;
   }
-  $states = _content_moderation_states();
+  $states = _content_moderation_states_names();
   $types = _content_moderation_moderate_node_types();
   foreach($types as $type) {
     foreach($states as $from_state) {
