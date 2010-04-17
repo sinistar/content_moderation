@@ -31,6 +31,16 @@ function content_moderation_schema() {
 
   $schema['content_moderation_states'] = array(
     'description' => t('Defines all possible states'),
+    'export' => array(
+      'key' => 'name',
+      'identifier' => 'content_moderation_state',
+      'default hook' => 'default_content_moderation_state',  // Function hook name.
+      'api' => array(
+        'owner' => 'content_moderation',
+        'api' => 'content_moderation_state',  // Base name for api include files.
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
     'fields' => array(
       'name'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
       'descr'      => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE),
