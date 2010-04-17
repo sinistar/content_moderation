@@ -8,10 +8,10 @@ function content_moderation_admin_settings() {
 	$form['content_moderation_pending_count'] = array(
     '#title' => t('Number of pending revisions to be shown in content_moderation block'),
     '#type' => 'textfield',
-		'#size' => 3,
-		'#maxlength' => 3,
+    '#size' => 3,
+    '#maxlength' => 3,
     '#description' => t('Define how many pending revisions shall be visible in content_moderation block. This number will restrict the shown revisions cutting out oldest ones first. By setting this to 1 you\'ll only ever see the newest pending revision.'),
-		'#default_value' => variable_get('content_moderation_pending_count', 5),
+    '#default_value' => variable_get('content_moderation_pending_count', 5),
   );
   $form['content_moderation_moderate_latest_only'] = array(
     '#title' => t('Edit stop on revision-moderation'),
@@ -22,13 +22,13 @@ function content_moderation_admin_settings() {
   $form['content_moderation_force_publish'] = array(
     '#title' => t('Force publishing on new nodes'),
     '#type' => 'checkbox',
-		'#description' => t('The intended default value is checked (feature by design).<br/>However, it is then impossible to first create a(n unpublished) draft. By unchecking this feature content types\' publishing options may be set to "unpublished". When a draft goes "live" (transition into moderation state "live") for the first time the node will be published automatically. After that only users with the right "administer nodes" are able to unpublish it again (making it a draft).<br/>'),
-		'#default_value' => variable_get('content_moderation_force_publish', 1),
+    '#description' => t('The intended default value is checked (feature by design).<br/>However, it is then impossible to first create a(n unpublished) draft. By unchecking this feature content types\' publishing options may be set to "unpublished". When a draft goes "live" (transition into moderation state "live") for the first time the node will be published automatically. After that only users with the right "administer nodes" are able to unpublish it again (making it a draft).<br/>'),
+    '#default_value' => variable_get('content_moderation_force_publish', 1),
   );
 
 
 
-	return system_settings_form($form);
+  return system_settings_form($form);
 }
 
 
@@ -38,7 +38,7 @@ function content_moderation_admin_settings() {
  */
 function content_moderation_admin_settings_states() {
 
-	$form['content_moderation_states'] = array(
+  $form['content_moderation_states'] = array(
     '#type' => 'fieldset',
     '#title' => t('Content moderation states'),
     '#description' => t('Use to define new states or to delete existing ones. States have to be defined before corresponding transitions can be set up.')
@@ -70,7 +70,7 @@ function content_moderation_admin_settings_states() {
     '#value' => t('Save')
   );
 
-	return $form;
+  return $form;
 }
 
 
@@ -132,7 +132,7 @@ function _content_moderation_admin_states() {
  * Get all transitions possible
  */
 function _content_moderation_admin_transitions() {
-  $result = db_query('select * from {content_moderation_transition}');
+  $result = db_query('SELECT * FROM {content_moderation_transition}');
   //TODO: cache this
   $transitions = array();
   while ($transition = db_fetch_object($result)) {
@@ -142,38 +142,36 @@ function _content_moderation_admin_transitions() {
   return $transitions;
 }
 
-function content_moderation_admin_settings_states_submit($form, &$form_state)
-{
+function content_moderation_admin_settings_states_submit($form, &$form_state) {
   $form_values = $form_state['values'];
-	foreach ( $form_values['delete_states'] AS $state => $action ) {
-		if ( is_string($action) ) {
-			$q = ' DELETE FROM {content_moderation_states} WHERE name = "%s" ';
-			$r = db_query($q, array($state));
-			$q = ' DELETE FROM {content_moderation_transition} WHERE from_name = "%s" OR from_name = "%s" ';
-			$r = db_query($q, array($state, $state));
-		}
-	}
-	if ( isset($form_values['new_state_name']) && strlen($form_values['new_state_name']) > 0 ) {
+  foreach ( $form_values['delete_states'] AS $state => $action ) {
+    if ( is_string($action) ) {
+      $q = ' DELETE FROM {content_moderation_states} WHERE name = "%s" ';
+      $r = db_query($q, array($state));
+      $q = ' DELETE FROM {content_moderation_transition} WHERE from_name = "%s" OR from_name = "%s" ';
+      $r = db_query($q, array($state, $state));
+    }
+  }
+  if (isset($form_values['new_state_name']) && strlen($form_values['new_state_name']) > 0) {
     $new_state = (object) null;
     $new_state->name = $form_values['new_state_name'];
-		if ( isset($form_values['new_state_desc']) && strlen($form_values['new_state_desc']) > 0 ) {
+    if (isset($form_values['new_state_desc']) && strlen($form_values['new_state_desc']) > 0) {
       $new_state->desc = $form_values['new_state_desc'];
-		}
+    }
     drupal_write_record('content_moderation_states', $new_state);
-	}
-	drupal_set_message(t('Your settings have been saved.'));
+  }
+  drupal_set_message(t('Your settings have been saved.'));
 }
 
-function content_moderation_admin_settings_transitions_submit($form, &$form_state)
-{
-	$form_values = $form_state['values'];
-	foreach ( $form_values['delete_transitions'] AS $transition => $action ) {
-		if ( is_string($action) ) {
-			$transinfo = explode('---', $transition);
-			$q = ' DELETE FROM {content_moderation_transition} WHERE from_name = "%s" AND to_name = "%s" ';
-			$r = db_query($q, array($transinfo[0], $transinfo[1]));
-		}
-	}
+function content_moderation_admin_settings_transitions_submit($form, &$form_state) {
+  $form_values = $form_state['values'];
+  foreach ( $form_values['delete_transitions'] AS $transition => $action ) {
+    if ( is_string($action) ) {
+      $transinfo = explode('---', $transition);
+      $q = ' DELETE FROM {content_moderation_transition} WHERE from_name = "%s" AND to_name = "%s" ';
+      $r = db_query($q, array($transinfo[0], $transinfo[1]));
+    }
+  }
 	if ( $form_values['new_transition_from'] != '0' && $form_values['new_transition_to'] != '0' ) {
     $new_transition = (object) null;
     $new_transition->from_name = $form_values['new_transition_from'];
