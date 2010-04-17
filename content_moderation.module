@@ -304,9 +304,16 @@ function content_moderation_drupalwiki_menu_alter($tree) {
 /*
  * Get all states possible
  */
-function content_moderation_states() {
+function content_moderation_states($type = 'all') {
   ctools_include('export');
-  return ctools_export_load_object('content_moderation_states', 'all');
+  $states = ctools_export_load_object('content_moderation_states', 'all');
+  if ($typ == 'names') {
+    foreach ($states as $name => $states) {
+      $return[$name] = $name;
+    }
+    return $return;
+  }
+  return $states;
 }
 
 /*
@@ -317,7 +324,7 @@ function content_moderation_perm() {
   // This user right is later used for granting the user the approval of pending version
   // making those version "live".
 
-  $states = _content_moderation_states_names();
+  $states = content_moderation_states('names');
   $types = _content_moderation_moderate_node_types();
 
   $rights = array();
