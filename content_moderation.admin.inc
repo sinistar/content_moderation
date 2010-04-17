@@ -97,14 +97,14 @@ function content_moderation_admin_settings_transitions() {
     '#type' => 'select',
     '#title' => t('New transition from'),
     '#default_value' => array(),
-    '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states_names()),
+    '#options' => array_merge(array(0 => t('Choose a state')), _content_moderation_admin_states_names()),
   );
 
   $form['content_moderation_transitions']['new_transition_to'] = array(
     '#type' => 'select',
     '#title' => t('to'),
     '#default_value' => array(),
-    '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states_names()),
+    '#options' => array_merge(array(0 => t('Choose a state')), _content_moderation_admin_states_names()),
   );
 
   $form['content_moderation_transitions']['submit_transitions'] = array(
