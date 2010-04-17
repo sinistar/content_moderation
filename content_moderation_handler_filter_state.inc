@@ -17,13 +17,9 @@ class content_moderation_handler_filter_state extends views_handler_filter {
   }
 
   function value_form(&$form, &$form_state) {
-    $result = db_query("select name FROM {content_moderation_states}");
-    while ($item = db_fetch_array($result)) {
-      $options[$item['name']] = $item['name'];
-    }
     $form['value'] = array(
       '#type' => 'select',
-      '#options' => $options,
+      '#options' => _content_moderation_admin_states_names(),
       '#default_value' => $this->options['state'],
       '#title' => t('State'),
       '#description' => t('Select a workflow state (content moderation).'),

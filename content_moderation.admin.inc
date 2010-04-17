@@ -48,7 +48,7 @@ function content_moderation_admin_settings_states() {
     '#type' => 'checkboxes',
     '#title' => t('Delete existing states'),
     '#default_value' => array(),
-    '#options' => _content_moderation_admin_states(),
+    '#options' => _content_moderation_admin_states_names(),
     '#description' => t('Please note: when deleting an existing state all transitions involving this state will also be deleted.')
   );
 
@@ -97,14 +97,14 @@ function content_moderation_admin_settings_transitions() {
     '#type' => 'select',
     '#title' => t('New transition from'),
     '#default_value' => array(),
-    '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states()),
+    '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states_names()),
   );
 
   $form['content_moderation_transitions']['new_transition_to'] = array(
     '#type' => 'select',
     '#title' => t('to'),
     '#default_value' => array(),
-    '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states()),
+    '#options' => array_merge(array(0 => t('Choose a state')),_content_moderation_admin_states_names()),
   );
 
   $form['content_moderation_transitions']['submit_transitions'] = array(
@@ -119,11 +119,16 @@ function content_moderation_admin_settings_transitions() {
  * Get all states possible
  */
 function _content_moderation_admin_states() {
-  $result = db_query('select * from {content_moderation_states}');
-  //TODO: cache this
+  return ctools_export_load_object('content_moderation_states', 'all');
+}
+
+/**
+ * Get all states possible, but only name and description.
+ */
+function _content_moderation_admin_states_names() {
   $states = array();
-  while ($state = db_fetch_object($result)) {
-    $states[$state->name] = $state->descr ? $state->descr : $state->name;
+  foreach (_content_moderation_admin_states() as $name => $state) {
+    $states[$name] = $state->descr ? $state->descr : $state->name;
   }
   return $states;
 }
@@ -142,8 +147,7 @@ function _content_moderation_admin_transitions() {
   return $transitions;
 }
 
-function content_moderation_admin_settings_states_submit($form, &$form_state)
-{
+function content_moderation_admin_settings_states_submit($form, &$form_state) {
   $form_values = $form_state['values'];
 	foreach ( $form_values['delete_states'] AS $state => $action ) {
 		if ( is_string($action) ) {
