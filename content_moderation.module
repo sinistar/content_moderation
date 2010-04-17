@@ -47,27 +47,27 @@ function content_moderation_menu() {
       'access arguments' => array('administer site configuration'),
       'file' => 'content_moderation.admin.inc',
   );
-	$items['admin/settings/content_moderation/general'] = array(
-		'title' => 'General',
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-		'weight' => -1,
-	);
-	$items['admin/settings/content_moderation/states'] = array(
-		'title' => 'States',
-		'type' => MENU_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('content_moderation_admin_settings_states'),
-		'access arguments' => array('administer site configuration'),
-		'file' => 'content_moderation.admin.inc',
-	);
-	$items['admin/settings/content_moderation/transitions'] = array(
-		'title' => 'Transitions',
-		'type' => MENU_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('content_moderation_admin_settings_transitions'),
-		'access arguments' => array('administer site configuration'),
-		'file' => 'content_moderation.admin.inc',
-	);
+  $items['admin/settings/content_moderation/general'] = array(
+    'title' => 'General',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
+  $items['admin/settings/content_moderation/states'] = array(
+    'title' => 'States',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_moderation_admin_settings_states'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'content_moderation.admin.inc',
+  );
+  $items['admin/settings/content_moderation/transitions'] = array(
+    'title' => 'Transitions',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_moderation_admin_settings_transitions'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'content_moderation.admin.inc',
+  );
 
   return $items;
 }
