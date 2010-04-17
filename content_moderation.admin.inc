@@ -119,6 +119,7 @@ function content_moderation_admin_settings_transitions() {
  * Get all states possible
  */
 function _content_moderation_admin_states() {
+  ctools_include('export');
   return ctools_export_load_object('content_moderation_states', 'all');
 }
 
