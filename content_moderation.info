@@ -4,3 +4,4 @@ core = "6.x"
 name = Content Moderation
 description = Content Moderation (by Impressive.media)
 package = "Drupal Wiki"
+dependencies[] = ctools
