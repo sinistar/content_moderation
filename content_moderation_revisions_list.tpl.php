@@ -32,7 +32,6 @@ foreach($revisions as $rev) {
   $revision_link = l($rev->vid,"node/{$rev->nid}/revisions/{$rev->vid}/view",array('html' => true, 'attributes' => array( 'title' => t('View revision @rev.',array('@rev' => $rev->vid) ))));
 
   if(_content_moderation_statechange_allowed($rev->vid) !== false) {
-    dsm("allowed $rev->vid");
     $edit_state_link = l($edit_state_icon,_content_moderation_change_state_link($rev->vid,$rev->nid),array('html' => true, 'attributes' => array( 'title' => t('Change state of revision @rev.',array('@rev' => $rev->vid) ))));
   }
   if(module_exists('diff')){
