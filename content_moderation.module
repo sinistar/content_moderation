@@ -47,11 +47,11 @@ function content_moderation_menu() {
       'access arguments' => array('administer site configuration'),
       'file' => 'content_moderation.admin.inc',
   );
-	$items['admin/settings/content_moderation/general'] = array(
-		'title' => 'General',
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-		'weight' => -1,
-	);
+  $items['admin/settings/content_moderation/general'] = array(
+    'title' => 'General',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
 
   return $items;
 }
