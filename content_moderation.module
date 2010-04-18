@@ -41,7 +41,7 @@ function content_moderation_menu() {
   // Module settings.
   $items["admin/settings/content_moderation"] = array(
       'title' => 'Content moderation',
-      'description' => t('Configure content moderation.'),
+      'description' => 'Configure content moderation.',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('content_moderation_admin_settings'),
       'access arguments' => array('administer site configuration'),
@@ -51,22 +51,6 @@ function content_moderation_menu() {
 		'title' => 'General',
 		'type' => MENU_DEFAULT_LOCAL_TASK,
 		'weight' => -1,
-	);
-	$items['admin/settings/content_moderation/states'] = array(
-		'title' => 'States',
-		'type' => MENU_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('content_moderation_admin_settings_states'),
-		'access arguments' => array('administer site configuration'),
-		'file' => 'content_moderation.admin.inc',
-	);
-	$items['admin/settings/content_moderation/transitions'] = array(
-		'title' => 'Transitions',
-		'type' => MENU_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('content_moderation_admin_settings_transitions'),
-		'access arguments' => array('administer site configuration'),
-		'file' => 'content_moderation.admin.inc',
 	);
 
   return $items;
@@ -170,6 +154,16 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
   }
 
   switch ($op) {
+    case 'prepare':
+        if (_content_moderation_moderate_node_type($node->type)) {
+          $live =  _content_moderation_live_revision($node->nid);
+          //dsm($vid);
+          // We only need to change the behavior if the current version is not the latest pending version
+          if($live != NULL && $node->vid != $live->vid) {
+              drupal_set_message(t('You are now editing the most recent pending revision (@revision) and not the live version!',array('@revision' => $vid)),'warning', false);
+          }
+        }
+    break;
     case 'presave':
       // As we cant use $node->old_vid, which always points to the revision
       // on before the current, we need to save the live version ourself
@@ -224,7 +218,7 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
         // If this node has no live version yet, notice the user that the content is not valid.
         // Valid reasons are, that the node has been just created and not approved or, that all live
         // revisions have been revoked
-        drupal_set_message ( t('The content of this document has not been approved and is therefor not yet valid!'), 'warning' );
+        drupal_set_message ( t('The content of this document has not been approved and is therefor not valid yet!'), 'warning' );
       }
 
       // If we are showing a revision, show the author informations
@@ -436,17 +430,19 @@ function _content_moderation_node_edit_page($node) {
     // TODO: Maybe we need a exception for the live state to unapprove it later?
     if(count($moderated_revs) > 0) {
       $none_state = _content_moderation_none_state();
-      drupal_set_message(t('You cannot edit the document, as the latest revision is under moderation. Go back to the !state to be able to edit', array('!state' => $none_state)), 'warning');
+      drupal_set_message(t('You cannot edit the document, as the latest revision is under moderation. Set the revision back to the state "!state" to be able to edit.', array('!state' => $none_state)), 'warning');
       drupal_goto("node/{$node->nid}");
       return false;
     }
   }
   if (_content_moderation_moderate_node_type($node->type)) {
     $vid =  _content_moderation_latest_revision($node->nid);
-    // We only need to change the behavior if the current version is not the latest pending version
+    // Drupal uses the vid of the node table, not the real latest revision out of node_revisions
+    // so we need to determine if it differes. If yes, load the latst revision, as thats our last pending one.
+
     if($node->vid != $vid) {
+      // We only need to change the behavior if the current version is not the latest pending version.
       $node = node_load($node->nid,$vid);
-      drupal_set_message(t('You are now editing the most recent pending revision (@revision) and not the live version!',array('@revision' => $vid)),'warning');
     }
   }
 
@@ -484,7 +480,7 @@ function _content_moderation_history($node) {
  */
 function _content_moderation_live_revision($nid) {
   $live_state = _content_moderation_live_state();
-  $vid = db_result(db_query('SELECT vid from {content_moderation_node_history} WHERE nid=%d AND state_name="%s" order by hid DESC', $nid,$live_state));
+  $vid = db_result(db_query('SELECT vid from {content_moderation_node_history} WHERE nid=%d AND state_name="%s" order by hid DESC limit 1', $nid,$live_state));
   if($vid == false) {
     return NULL;
   }
