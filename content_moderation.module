@@ -510,7 +510,7 @@ function _content_moderation_none_state() {
 function _content_moderation_moderate_node_type($type) {
   // Is this content even in moderatation?
   $var = variable_get( "node_options_$type", array(0));
-  if( array_search('node_content_moderation',$var) ) {
+  if( array_search('node_content_moderation',$var,true) !== false ) {
     return true;
   }
   //else
