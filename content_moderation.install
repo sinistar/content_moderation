@@ -70,6 +70,7 @@ function content_moderation_schema() {
   return $schema;
 }
 
+
 function _content_moderation_insert_values() {
   $states[] = array('name' => 'none');
   $states[] = array('name' => 'review');

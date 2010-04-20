@@ -31,43 +31,27 @@ function content_moderation_menu() {
       'access arguments' => array('view history',1),
   );
 
-    $items["node/%node/latest_revision"] = array(
+  $items["node/%node/latest_revision"] = array(
       'page callback' => '_content_moderation_show_latest_revision',
       'page arguments' => array(1),
       'access callback' => '_content_moderation_access',
       'access arguments' => array('view revision',1),
   );
-  
+
   // Module settings.
   $items["admin/settings/content_moderation"] = array(
       'title' => 'Content moderation',
-      'description' => t('Configure content moderation.'),
+      'description' => 'Configure content moderation.',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('content_moderation_admin_settings'),
       'access arguments' => array('administer site configuration'),
       'file' => 'content_moderation.admin.inc',
   );
-	$items['admin/settings/content_moderation/general'] = array(
-		'title' => 'General',
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-		'weight' => -1,
-	);
-	$items['admin/settings/content_moderation/states'] = array(
-		'title' => 'States',
-		'type' => MENU_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('content_moderation_admin_settings_states'),
-		'access arguments' => array('administer site configuration'),
-		'file' => 'content_moderation.admin.inc',
-	);
-	$items['admin/settings/content_moderation/transitions'] = array(
-		'title' => 'Transitions',
-		'type' => MENU_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('content_moderation_admin_settings_transitions'),
-		'access arguments' => array('administer site configuration'),
-		'file' => 'content_moderation.admin.inc',
-	);
+  $items['admin/settings/content_moderation/general'] = array(
+    'title' => 'General',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
 
   return $items;
 }
@@ -170,6 +154,16 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
   }
 
   switch ($op) {
+    case 'prepare':
+        if (_content_moderation_moderate_node_type($node->type)) {
+          $live =  _content_moderation_live_revision($node->nid);
+          //dsm($vid);
+          // We only need to change the behavior if the current version is not the latest pending version
+          if($live != NULL && $node->vid != $live->vid) {
+              drupal_set_message(t('You are now editing the most recent pending revision (@revision) and not the live version!',array('@revision' => $vid)),'warning', false);
+          }
+        }
+    break;
     case 'presave':
       // As we cant use $node->old_vid, which always points to the revision
       // on before the current, we need to save the live version ourself
@@ -224,7 +218,7 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
         // If this node has no live version yet, notice the user that the content is not valid.
         // Valid reasons are, that the node has been just created and not approved or, that all live
         // revisions have been revoked
-        drupal_set_message ( t('The content of this document has not been approved and is therefor not yet valid!'), 'warning' );
+        drupal_set_message ( t('The content of this document has not been approved and is therefor not valid yet!'), 'warning' );
       }
 
       // If we are showing a revision, show the author informations
@@ -340,14 +334,6 @@ function content_moderation_reset_live_status($nid = NULL) {
 }
 
 /*
- * Implementation of hook_modify_first_revision_alter
- */
-function content_moderation_content_moderation_modify_first_revision_alter(&$node) {
-  $node->body = t('Initial revision - this node is under moderation and no revision has been set live yet.');
-  $node->log = t('Auto-creating live version as a template');
-}
-
-/*
  * Implementation of hook_form_alter
  */
 function content_moderation_form_node_type_form_alter(&$form, $form_state) {
@@ -369,6 +355,7 @@ function content_moderation_form_alter(&$form, $form_state, $form_id)  {
     $form['revision_information']['revision']['#prefix'] = t('As this content is in moderation, you cannot choose here. A new revision is always created.');
     $form['revision_information']['revision']['#disabled'] = true;
     $form['revision_information']['revision']['#default_value'] = true;
+
     $descr = t('You cant choose here, as this content is under moderation. Publishing is forced.');
     if(is_array($form['options']['status']) && variable_get('content_moderation_force_publish', 1)) {
       $form['options']['status']['#disabled'] = true;
@@ -390,7 +377,6 @@ function content_moderation_form_alter(&$form, $form_state, $form_id)  {
       $nid = $form['nid']['#value'];
       $form['#redirect'] = "node/$nid/latest_revision";
     }
-
   }
 }
 
@@ -437,12 +423,26 @@ function content_moderation_views_api() {
  * But we want to edit the VID which is the most recent one.
  */
 function _content_moderation_node_edit_page($node) {
+  if(variable_get('content_moderation_moderate_latest_only', 1) === 1) {
+    $moderated_revs = _content_moderation_has_moderated_revisions($node->nid);
+
+    // Do not allow state changing of revisions, which are not the latest
+    // TODO: Maybe we need a exception for the live state to unapprove it later?
+    if(count($moderated_revs) > 0) {
+      $none_state = _content_moderation_none_state();
+      drupal_set_message(t('You cannot edit the document, as the latest revision is under moderation. Set the revision back to the state "!state" to be able to edit.', array('!state' => $none_state)), 'warning');
+      drupal_goto("node/{$node->nid}");
+      return false;
+    }
+  }
   if (_content_moderation_moderate_node_type($node->type)) {
     $vid =  _content_moderation_latest_revision($node->nid);
-    // We only need to change the behavior if the current version is not the latest pending version
+    // Drupal uses the vid of the node table, not the real latest revision out of node_revisions
+    // so we need to determine if it differes. If yes, load the latst revision, as thats our last pending one.
+
     if($node->vid != $vid) {
+      // We only need to change the behavior if the current version is not the latest pending version.
       $node = node_load($node->nid,$vid);
-      drupal_set_message(t('You are now editing the most recent pending revision (@revision) and not the live version!',array('@revision' => $vid)),'warning');
     }
   }
 
@@ -476,19 +476,11 @@ function _content_moderation_history($node) {
 }
 
 /*
- * Calling our alter hook.
- */
-function _content_moderation_get_modfiy_for_first_revision(&$node) {
-  //TODO: hooks / alter here
-  drupal_alter('content_moderation_modify_first_revision', $node);
-}
-
-/*
  * Returning the node object of the live version of the node
  */
 function _content_moderation_live_revision($nid) {
   $live_state = _content_moderation_live_state();
-  $vid = db_result(db_query('SELECT vid from {content_moderation_node_history} WHERE nid=%d AND state_name="%s" order by hid DESC', $nid,$live_state));
+  $vid = db_result(db_query('SELECT vid from {content_moderation_node_history} WHERE nid=%d AND state_name="%s" order by hid DESC limit 1', $nid,$live_state));
   if($vid == false) {
     return NULL;
   }
@@ -503,13 +495,22 @@ function _content_moderation_live_revision($nid) {
 function _content_moderation_live_state() {
   return 'live';
 }
+
+/*
+ * Returns the key which represents the neutral non moderated version.
+ * Should be later an interface to change the live state
+ */
+function _content_moderation_none_state() {
+  return 'none';
+}
+
 /*
  * Determine if this content type is set to be moderated
  */
 function _content_moderation_moderate_node_type($type) {
   // Is this content even in moderatation?
   $var = variable_get( "node_options_$type", array(0));
-  if( array_search('node_content_moderation',$var) ) {
+  if( array_search('node_content_moderation',$var,true) !== false ) {
     return true;
   }
   //else
@@ -557,6 +558,7 @@ function _content_moderation_state_allowed($user,$from_state,$to_state,$node_typ
 /*
  * Provides a hook where modules can register there access handler.
  * Example:
+ *
  * function mymodul_content_moderation_access($op,$node) {
  *  switch($op) {
  *    case 'view history':
@@ -703,23 +705,21 @@ function _content_moderation_show_latest_revision($node) {
   menu_set_active_item("node/{$node->nid}/revisions/{$node->vid}/view");
   return node_page_view($node);
 }
-/*
-function content_moderation_date_formats() {
-  $formats[] = array(
-    'type' => 'contente_moderation_history',
-    'format' => 'd.m.y h:i',
-    'locales' => array('en'),
-  );
-   $formats[] = array(
-    'type' => 'contente_moderation_history',
-    'format' => 'd.m.y h:i',
-    'locales' => array('de'),
-  );
-}
 
-function content_moderation_date_format_types() {
-  return array(
-    'contente_moderation_history' => t('Content moderation history'),
-    'contente_moderation_small' => t('Content moderation small'),
-  );
-}*/
+function _content_moderation_has_moderated_revisions($nid) {
+  $none_state = _content_moderation_none_state();
+  $live_state = _content_moderation_live_state();
+  // Get all revisions which are neither in the none nor in the live state
+  $result = db_query("select nr.*,cmrs.state from {node_revisions} as nr LEFT JOIN {content_moderation_revision_state} as cmrs on nr.vid=cmrs.vid where nr.nid=%d AND cmrs.state!='%s' AND cmrs.state!='%s'",$nid,$none_state,$live_state);
+
+  if($result === false) {
+    return array();
+  }
+
+  $revs = array();
+  while ($rev = db_fetch_object($result)) {
+    $revs[] = $rev;
+  }
+
+  return $revs;
+}
