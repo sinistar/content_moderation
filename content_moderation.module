@@ -160,7 +160,7 @@ function content_moderation_nodeapi(&$node, $op, $a3, $a4) {
           //dsm($vid);
           // We only need to change the behavior if the current version is not the latest pending version
           if($live != NULL && $node->vid != $live->vid) {
-              drupal_set_message(t('You are now editing the most recent pending revision (@revision) and not the live version!',array('@revision' => $vid)),'warning', false);
+              drupal_set_message(t('You are now editing the most recent pending revision (@revision) and not the live version!',array('@revision' => $node->vid)),'warning', false);
           }
         }
     break;
