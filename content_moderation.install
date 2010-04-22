@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: content_moderation.install,v 1.7.2.17 2010/04/18 11:31:29 eugenmayer Exp $
 
 # Copyright (c) 2010 Impressive.media
 # Author: Eugen Mayer
@@ -80,16 +80,16 @@ function _content_moderation_insert_values() {
     ),
   );
   foreach($states as $state) {
-      db_query('insert into {content_moderation_states} (`name`) VALUES("%s")',$state);
+      db_query("insert into {content_moderation_states} (name) VALUES('%s')",$state);
   }
 
   //transitions
-  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("none","review","all")');
-  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("review","approve","all")');
-  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("approve","live","all")');
-  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("review","none","all")');
-  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("approve","review","all")');
-  db_query('insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES("approve","none","all")');
+  db_query("insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES('none','review','all')");
+  db_query("insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES('review','approve','all')");
+  db_query("insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES('approve','live','all')");
+  db_query("insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES('review','none','all')");
+  db_query("insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES('approve','review','all')");
+  db_query("insert into {content_moderation_transition} (from_name,to_name,ntype) VALUES('approve','none','all')");
 }
 
 function content_moderation_update_6001() {
@@ -98,7 +98,7 @@ function content_moderation_update_6001() {
 }
 
 function content_moderation_update_6003() {
-  db_query("ALTER TABLE `content_moderation_states` ADD `weight` SMALLINT NOT NULL DEFAULT '0'");
+  db_query("ALTER TABLE content_moderation_states ADD weight SMALLINT NOT NULL DEFAULT '0'");
   return array();
 }
 
