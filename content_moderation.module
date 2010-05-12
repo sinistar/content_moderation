@@ -732,7 +732,7 @@ function _content_moderation_has_moderated_revisions($nid) {
  * Helper to ensure, that Create new revision is always checked, when a node type is selected to be moderated
  */
 function _content_moderation_validate_node_type_form($from,&$form_state) {
-  if($form_state['values']['node_options']['node_content_moderation'] == 'node_content_moderation' && $form_state['values']['node_options']['revision'] === 0) {
+  if($form_state['values']['node_options']['node_content_moderation'] === 'node_content_moderation' && $form_state['values']['node_options']['revision'] === 0) {
     form_set_error('node_options',t('If you chose to moderate this content type, you must switch "Create new revision" in the workflow tab on'));
   }
 }
