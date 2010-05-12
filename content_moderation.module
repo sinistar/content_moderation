@@ -572,6 +572,10 @@ function _content_moderation_state_allowed($user,$from_state,$to_state,$node_typ
  * }
  */
 function _content_moderation_access($op,$node) {
+  if(_content_moderation_moderate_node_type($node->type) === false) {
+    return false;
+  }
+
   $modules = module_implements('content_moderation_access');
   if(count($modules) > 0) {
     $grants = module_invoke_all('content_moderation_access',$op,$node);
