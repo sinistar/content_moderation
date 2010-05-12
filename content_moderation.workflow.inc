@@ -168,8 +168,13 @@ function _content_moderation_save_history($node,$curstate,$nextstate,$uid,$comme
 /*
  * Gets the history of a node or a revision, depending on the key.
  */
-function _content_moderation_get_history($key) {
-  $result = db_query('select * from {content_moderation_node_history} where '.$key['name'].'=%d order by stamp DESC' ,$key['value']);
+function _content_moderation_get_history($key, $tostate = NULL) {
+  if($tostate != NULL) {
+	  $result = db_query('select * from {content_moderation_node_history} where '.$key['name'].'=%d AND state_name="%s" order by stamp DESC' ,$key['value'],$tostate);
+  }
+  else {
+    $result = db_query('select * from {content_moderation_node_history} where '.$key['name'].'=%d order by stamp DESC' ,$key['value']);
+  }
   $history = array();
 
   while ($entry = db_fetch_object($result)) {

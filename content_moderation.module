@@ -744,3 +744,12 @@ function _content_moderation_submit_node_form($form, &$form_state){
   $nid = $form['nid']['#value'];
   $form_state['redirect'] = "node/$nid/latest_revision";
 }
+
+function _content_moderation_latest_live_in_history($nid) {
+  $result = _content_moderation_get_history(array('name' => 'nid','value' => $nid), 'live');
+  if(is_array($result) && count($result) > 0) {	
+    return $result[0];
+  }
+  // else
+  return false;
+}
