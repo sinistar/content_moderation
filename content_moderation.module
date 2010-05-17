@@ -291,7 +291,7 @@ function content_moderation_drupalwiki_menu_alter($tree) {
       'href' => "node/$nid/edit",
       'icon' => icon_get_icon_path('edit','20'),
       'has_childred' => 0
-      );
+    );
     $editbtn['below'] = array();
     array_unshift($tree,$editbtn);
   }
@@ -310,12 +310,12 @@ function content_moderation_perm() {
   $rights = array();
   foreach($types as $type) {
     foreach($states as $from_state) {
-        $to_states = _content_moderation_next_states($from_state,$type);
-        // values are translated
-        $to_states = array_keys($to_states);
-        foreach($to_states as $to_state) {
-          $rights[] = "content moderation $type state $from_state to $to_state";
-        }
+      $to_states = _content_moderation_next_states($from_state,$type);
+      // values are translated
+      $to_states = array_keys($to_states);
+      foreach($to_states as $to_state) {
+        $rights[] = "content moderation $type state $from_state to $to_state";
+      }
     }
     $rights[] = "content moderation view $type moderation history";
   }
@@ -398,7 +398,8 @@ function theme_content_moderation_node_history($history) {
       format_date($e->stamp,'small'),                         // date
       l($user->name,"user/{$user->uid}"),                     // Who changed that state?
       "<span class='$state_class'>".ucfirst(t('!old',array('!old' => $e->old_state_name))).' -> '.ucfirst(t($e->state_name)).'</span>',             // Transition
-      l($e->vid,"node/{$e->nid}/revisions/{$e->vid}/view")   // revision
+      l($e->vid,"node/{$e->nid}/revisions/{$e->vid}/view"),   // revision
+      check_plain($e->comment), // comment
     );
   }
   $title = t('Moderation history');
@@ -409,6 +410,7 @@ function theme_content_moderation_node_history($history) {
                       t('Author'),
                       t('Transition'),
                       t('Revision'),
+                      t('Comment'),
                     )
                 ,$data);
 }
@@ -750,7 +752,7 @@ function _content_moderation_submit_node_form($form, &$form_state){
 
 function _content_moderation_latest_live_in_history($nid) {
   $result = _content_moderation_get_history(array('name' => 'nid','value' => $nid), 'live');
-  if(is_array($result) && count($result) > 0) {	
+  if(is_array($result) && count($result) > 0) {
     return $result[0];
   }
   // else
