@@ -307,7 +307,6 @@ function content_moderation_perm() {
   // making those version "live".
   $states = _content_moderation_states();
   $types = _content_moderation_moderate_node_types();
-
   $rights = array();
   foreach($types as $type) {
     foreach($states as $from_state) {

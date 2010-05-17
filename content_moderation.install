@@ -91,7 +91,7 @@ function _content_moderation_insert_values() {
   $transitions[] = array('approve', 'none',     'all');
   foreach($transitions AS $transition) {
     // See http://drupal.org/node/568640 to change this after it's fixed.
-    db_query('INSERT INTO {content_moderation_transition} (from_name,to_name,ntype) VALUES("' . $transition[0] . '","' . $transition[0] . '","' . $transition[0] . '")');
+    db_query('INSERT INTO {content_moderation_transition} (from_name,to_name,ntype) VALUES("' . $transition[0] . '","' . $transition[1] . '","' . $transition[2] . '")');
     //drupal_write_record('content_moderation_transition', $transition);
   }
 }
